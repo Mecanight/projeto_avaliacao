@@ -16,6 +16,7 @@ class ConteudoFormDialogState extends State<ConteudoFormDialog> {
   final comentarioController = TextEditingController();
   final dataController = TextEditingController();
   final _dataFormatado = DateFormat('dd/MM/yyyy');
+  final localizaController = TextEditingController();
 
   @override
   void initState() {
@@ -36,18 +37,15 @@ class ConteudoFormDialogState extends State<ConteudoFormDialog> {
         child: ListView(
           children: [
             TextFormField(
-              decoration: InputDecoration(
-                labelText: 'Localização',
-                prefixIcon: IconButton(
-                  icon: Icon(Icons.gps_fixed),
-                  onPressed: () {},
-                ),
-                suffixIcon: IconButton(
-                  icon: Icon(Icons.clear),
-                  onPressed: () {},
-                ),
-              ),
-              readOnly: true,
+              controller: comentarioController,
+              decoration: InputDecoration(labelText: 'Comentário'),
+              maxLines: null,
+              validator: (String? valor) {
+                if (valor == null || valor.isEmpty) {
+                  return 'Informe o Comentário!';
+                }
+                return null;
+              },
             ),
             TextFormField(
               controller: dataController,
@@ -65,15 +63,18 @@ class ConteudoFormDialogState extends State<ConteudoFormDialog> {
               readOnly: true,
             ),
             TextFormField(
-              controller: comentarioController,
-              decoration: InputDecoration(labelText: 'Comentário'),
-              maxLines: null,
-              validator: (String? valor) {
-                if (valor == null || valor.isEmpty) {
-                  return 'Informe o Comentário!';
-                }
-                return null;
-              },
+              decoration: InputDecoration(
+                labelText: 'Localização',
+                prefixIcon: IconButton(
+                  icon: Icon(Icons.gps_fixed),
+                  onPressed: () {},
+                ),
+                suffixIcon: IconButton(
+                  icon: Icon(Icons.clear),
+                  onPressed: () {},
+                ),
+              ),
+              readOnly: true,
             ),
           ],
         ),

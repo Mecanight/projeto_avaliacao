@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
-// import 'package:projeto_avaliacao/dao/viagem_dao.dart';
+import 'package:projeto_avaliacao/dao/viagem_dao.dart';
 import 'package:projeto_avaliacao/model/viagem.dart';
+import 'package:projeto_avaliacao/pages/datalhe_tarefa_page.dart';
 import 'package:projeto_avaliacao/pages/filtro_page.dart';
 import 'package:projeto_avaliacao/widgets/conteudo_form_dialog.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class ListaViagemPage extends StatefulWidget {
   @override
@@ -13,17 +15,45 @@ class ListaViagemPage extends StatefulWidget {
 class _ListaViagemPageState extends State<ListaViagemPage> {
   final _viagens = <Viagem>[];
 
-  // final _dao = ViagemDao(); // To Do - para banco ativar
-  var _ultimoId = 0; // To Do - para banco eliminar
+  final _dao = ViagemDao();
+  var _carregando = false;
 
   static const ACAO_EDITAR = 'editar';
   static const ACAO_EXCLUIR = 'excluir';
+  static const ACAO_VISUALIZAR = 'visualizar';
 
-// To Do - para banco ativar
-  // void initstate() {
-  //   super.initState();
-  //   _atualizarLista();
-  // }
+  @override
+  void initState() {
+    super.initState();
+    _atualizarLista();
+  }
+
+  void _atualizarLista() async {
+    setState(() {
+      _carregando = true;
+    });
+
+    final prefs = await SharedPreferences.getInstance();
+    final _campoOrdenacao =
+        prefs.getString(FiltroPage.CHAVE_CAMPO_ORDENACAO) ?? Viagem.campo_id;
+    final _usarOrdemDecrescente =
+        prefs.getBool(FiltroPage.CHAVE_ORDENAR_DECRESCENTE) == true;
+    final _filtroComentario =
+        prefs.getString(FiltroPage.CHAVE_FILTRO_COMENTARIO) ?? '';
+
+    final tarefas = await _dao.Lista(
+      filtro: _filtroComentario,
+      campoOrdenacao: _campoOrdenacao,
+      usarOrdemDecrescente: _usarOrdemDecrescente,
+    );
+    setState(() {
+      _viagens.clear();
+      if (tarefas.isNotEmpty) {
+        _carregando = false;
+        _viagens.addAll(tarefas);
+      }
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -49,22 +79,43 @@ class _ListaViagemPageState extends State<ListaViagemPage> {
           icon: const Icon(
             Icons.filter_list,
           ),
-          // alignment: Alignment.topLeft,
         )
       ],
     );
   }
 
   Widget _criarBody() {
+    if (_carregando) {
+      return const Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Align(
+            alignment: AlignmentDirectional.center,
+            child: CircularProgressIndicator(),
+          ),
+          Align(
+            alignment: AlignmentDirectional.center,
+            child: Padding(
+              padding: EdgeInsets.only(top: 10),
+              child: Text(
+                'Carregando suas Tarefas!',
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+          )
+        ],
+      );
+    }
     if (_viagens.isEmpty) {
       return Center(
         child: Container(
-          // alignment: Alignment.topCenter,
-          // padding: const EdgeInsets.only(top: 120),
           child: const Text(
             'Sem viagens por enquanto!',
             style: TextStyle(
-              fontSize: 25,
+              fontSize: 20,
               fontWeight: FontWeight.w500,
             ),
           ),
@@ -77,7 +128,8 @@ class _ListaViagemPageState extends State<ListaViagemPage> {
         final viagem = _viagens[index];
         return Container(
           decoration: BoxDecoration(
-            color: Color.fromARGB(255, 162, 240, 168), // Cor de fundo do container
+            color:
+                Color.fromARGB(255, 162, 240, 168), // Cor de fundo do container
             borderRadius: BorderRadius.circular(20), // Bordas arredondadas
           ),
           child: PopupMenuButton<String>(
@@ -89,12 +141,12 @@ class _ListaViagemPageState extends State<ListaViagemPage> {
             itemBuilder: (BuildContext context) => criarItensMenuPopUp(),
             onSelected: (String valorSelecionado) {
               if (valorSelecionado == ACAO_EDITAR) {
-                _abrirForm(
-                    viagemAtual: viagem,
-                    indice:
-                        index); // To Do - para banco eliminar "indice: index"
+                _abrirForm(viagemAtual: viagem);
+              } else if (valorSelecionado == ACAO_EXCLUIR) {
+                _excluir(viagem);
               } else {
-                _excluir(index /*To Do - p/ banco substituir por "viagem"*/);
+                Navigator.of(context).push(MaterialPageRoute(
+                    builder: (_) => DetalheViagemPage(viagem: viagem)));
               }
             },
           ),
@@ -112,7 +164,7 @@ class _ListaViagemPageState extends State<ListaViagemPage> {
     navigator.pushNamed(FiltroPage.ROUTE_NAME).then(
       (alterouValor) {
         if (alterouValor == true) {
-          //implementação de filtro
+          _atualizarLista();
         }
       },
     );
@@ -120,6 +172,17 @@ class _ListaViagemPageState extends State<ListaViagemPage> {
 
   List<PopupMenuEntry<String>> criarItensMenuPopUp() {
     return [
+      const PopupMenuItem(
+          value: ACAO_VISUALIZAR,
+          child: Row(
+            children: [
+              Icon(Icons.info, color: Colors.blue),
+              Padding(
+                padding: EdgeInsets.only(left: 10),
+                child: Text('Visualizar'),
+              )
+            ],
+          )),
       const PopupMenuItem(
         value: ACAO_EDITAR,
         child: Row(
@@ -147,8 +210,7 @@ class _ListaViagemPageState extends State<ListaViagemPage> {
     ];
   }
 
-  Future _excluir(
-      int indice /*To Do - p/ banco substituir por "Viagem viagem"*/) {
+  Future _excluir(Viagem viagem) {
     return showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -176,21 +238,14 @@ class _ListaViagemPageState extends State<ListaViagemPage> {
             TextButton(
                 onPressed: () {
                   Navigator.of(context).pop();
-                  setState(
-                    () {
-                      _viagens.removeAt(indice);
-                    },
-                  );
-
-                  // To Do - para banco ativar
-                  // if (viagem.id == null) {
-                  //   return;
-                  // }
-                  // _dao.remover(viagem.id!).then((success) {
-                  //   if (success) {
-                  //     _atualizarLista();
-                  //   }
-                  // });
+                  if (viagem.id == null) {
+                    return;
+                  }
+                  _dao.remover(viagem.id!).then((success) {
+                    if (success) {
+                      _atualizarLista();
+                    }
+                  });
                 },
                 child: Text('Ok')),
           ],
@@ -199,8 +254,7 @@ class _ListaViagemPageState extends State<ListaViagemPage> {
     );
   }
 
-  void _abrirForm({Viagem? viagemAtual, int? indice}) {
-    // To Do - para banco eliminar "int? indice"
+  void _abrirForm({Viagem? viagemAtual}) {
     final key = GlobalKey<ConteudoFormDialogState>();
     showDialog(
       context: context,
@@ -222,21 +276,11 @@ class _ListaViagemPageState extends State<ListaViagemPage> {
                   setState(
                     () {
                       final novaViagem = key.currentState!.novaViagem;
-                      if (indice == null) {
-                        //eliminar
-                        novaViagem.id = ++_ultimoId; //eliminar
-                        _viagens.add(novaViagem); //eliminar
-                      } else {
-                        //eliminar
-                        _viagens[indice] = novaViagem; //eliminar
-                      } //eliminar
-
-                      // To Do - para banco ativar \/ e eliminar /\
-                      // _dao.salvar(novaViagem).then((success) {
-                      //   if (success) {
-                      //     _atualizarLista();
-                      //   }
-                      // });
+                      _dao.salvar(novaViagem).then((success) {
+                        if (success) {
+                          _atualizarLista();
+                        }
+                      });
                     },
                   );
                   Navigator.of(context).pop();
@@ -249,14 +293,4 @@ class _ListaViagemPageState extends State<ListaViagemPage> {
       },
     );
   }
-  // To Do - para banco ativar
-  // void _atualizarLista() async {
-  //   final viagens = await _dao.Lista();
-  //   setState(() {
-  //     _viagens.clear();
-  //     if (viagens.isNotEmpty) {
-  //       _viagens.addAll(viagens);
-  //     }
-  //   });
-  // }
 }

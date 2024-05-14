@@ -108,6 +108,11 @@ class _FiltroPageState extends State<FiltroPage> {
     return true;
   }
 
+  void _onFiltroDComentarioChange(String? valor) {
+    prefs.setString(FiltroPage.CHAVE_FILTRO_COMENTARIO, valor ?? '');
+    _alterouValores = true;
+  }
+
   void _onCampoOrdenacaoChanged(String? valor) {
     prefs.setString(FiltroPage.CHAVE_CAMPO_ORDENACAO, valor ?? '');
     _alterouValores = true;
@@ -126,10 +131,5 @@ class _FiltroPageState extends State<FiltroPage> {
         _usarOrdemDecrescente = valor == true;
       },
     );
-  }
-
-  void _onFiltroDComentarioChange(String? valor) {
-    prefs.setString(FiltroPage.CHAVE_FILTRO_COMENTARIO, valor ?? '');
-    _alterouValores = true;
   }
 }
