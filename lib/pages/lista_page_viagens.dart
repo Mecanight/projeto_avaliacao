@@ -98,7 +98,7 @@ class _ListaViagemPageState extends State<ListaViagemPage> {
             child: Padding(
               padding: EdgeInsets.only(top: 10),
               child: Text(
-                'Carregando suas Tarefas!',
+                'Carregando seus diários de Viagem!',
                 style: TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.bold,

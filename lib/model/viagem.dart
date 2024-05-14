@@ -31,6 +31,7 @@ class Viagem {
         campo_comentario: comentario,
         campo_data:
             data == null ? null : DateFormat("yyyy-MM-dd").format(data!),
+        campo_localiza: localiza,
       };
 
   factory Viagem.fromMap(Map<String, dynamic> map) => Viagem(
