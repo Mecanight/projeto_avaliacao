@@ -21,7 +21,7 @@ class DatabaseProvider {
     String databasePath = await getDatabasesPath();
     String dbPath = '$databasePath/$_dbName';
     return await openDatabase(dbPath,
-        version: _dbVersion, onCreate: _onCreate/*, onUpgrade: _onUpgrade*/);
+        version: _dbVersion, onCreate: _onCreate, onUpgrade: _onUpgrade);
   }
 
   Future<void> _onCreate(Database db, int version) async {
@@ -35,15 +35,15 @@ class DatabaseProvider {
       ''');
   }
 
-  // Future<void> _onUpgrade(Database db, int oldVersion, int newVersion) async {
-  //   switch (oldVersion) {
-  //     case 1:
-  //       await db.execute('''
-  //       ALTER TABLE ${Viagem.nome_tabela}
-  //       ADD ${Viagem.campo_localiza} TEXT
-  //       ''');
-  //   }
-  // }
+  Future<void> _onUpgrade(Database db, int oldVersion, int newVersion) async {
+    switch (oldVersion) {
+      case 1:
+        await db.execute('''
+        ALTER TABLE ${Viagem.nome_tabela}
+        ADD ${Viagem.campo_localiza} TEXT
+        ''');
+    }
+  }
 
   Future<void> close() async {
     if (_database != null) {
