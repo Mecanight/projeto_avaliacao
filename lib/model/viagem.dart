@@ -7,7 +7,7 @@ class Viagem {
   static const campo_data = 'data';
   static const campo_localiza = 'localiza';
 
-  int id;
+  int? id;
   String comentario;
   DateTime? data;
   String localiza;

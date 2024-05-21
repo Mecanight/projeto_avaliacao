@@ -110,7 +110,7 @@ class ConteudoFormDialogState extends State<ConteudoFormDialog> {
   bool dadosValidados() => formKey.currentState?.validate() == true;
 
   Viagem get novaViagem => Viagem(
-      id: widget.viagemAtual?.id ?? 0,
+      id: widget.viagemAtual?.id ?? null,
       comentario: comentarioController.text,
       data: dataController.text.isEmpty
           ? null

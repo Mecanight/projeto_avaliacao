@@ -126,10 +126,8 @@ class _FiltroPageState extends State<FiltroPage> {
   void _onUsarOrdemDecrescenteChange(bool? valor) {
     prefs.setBool(FiltroPage.CHAVE_ORDENAR_DECRESCENTE, valor == true);
     _alterouValores = true;
-    setState(
-      () {
-        _usarOrdemDecrescente = valor == true;
-      },
-    );
+    setState(() {
+      _usarOrdemDecrescente = valor == true;
+    });
   }
 }

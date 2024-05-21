@@ -25,7 +25,7 @@ class DetalheViagemPageState extends State<DetalheViagemPage> {
 
   Widget _criarBody() {
     return Padding(
-      padding: EdgeInsets.all(10),
+      padding: const EdgeInsets.all(10),
       child: ListView(
         children: [
           Row(
@@ -36,20 +36,20 @@ class DetalheViagemPageState extends State<DetalheViagemPage> {
           ),
           Row(
             children: [
-              const Campo(descricao: 'Cometário:'),
-              Valor(valor: '${widget.viagem.comentario}'),
-            ],
-          ),
-          Row(
-            children: [
               const Campo(descricao: 'Data:'),
-              Valor(valor: '${widget.viagem.dataFormatada}'),
+              Valor(valor: widget.viagem.dataFormatada),
             ],
           ),
           Row(
             children: [
               const Campo(descricao: 'Localização:'),
-              Valor(valor: '${widget.viagem.localiza}'),
+              Valor(valor: widget.viagem.localiza),
+            ],
+          ),
+          Row(
+            children: [
+              const Campo(descricao: 'Cometário:'),
+              Valor(valor: widget.viagem.comentario),
             ],
           ),
         ],

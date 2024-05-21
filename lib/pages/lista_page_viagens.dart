@@ -1,8 +1,9 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:projeto_avaliacao/dao/viagem_dao.dart';
 import 'package:projeto_avaliacao/model/viagem.dart';
-import 'package:projeto_avaliacao/pages/datalhe_tarefa_page.dart';
+import 'package:projeto_avaliacao/pages/datalhe_viagem_page.dart';
 import 'package:projeto_avaliacao/pages/filtro_page.dart';
 import 'package:projeto_avaliacao/widgets/conteudo_form_dialog.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -29,9 +30,11 @@ class _ListaViagemPageState extends State<ListaViagemPage> {
   }
 
   void _atualizarLista() async {
-    setState(() {
-      _carregando = true;
-    });
+    setState(
+      () {
+        _carregando = true;
+      },
+    );
 
     final prefs = await SharedPreferences.getInstance();
     final _campoOrdenacao =
@@ -41,18 +44,21 @@ class _ListaViagemPageState extends State<ListaViagemPage> {
     final _filtroComentario =
         prefs.getString(FiltroPage.CHAVE_FILTRO_COMENTARIO) ?? '';
 
-    final tarefas = await _dao.Lista(
+    final viagens = await _dao.Lista(
       filtro: _filtroComentario,
       campoOrdenacao: _campoOrdenacao,
       usarOrdemDecrescente: _usarOrdemDecrescente,
     );
-    setState(() {
-      _viagens.clear();
-      if (tarefas.isNotEmpty) {
+
+    setState(
+      () {
+        _viagens.clear();
+        // if (viagens.isNotEmpty || viagens.isEmpty) {
         _carregando = false;
-        _viagens.addAll(tarefas);
-      }
-    });
+        _viagens.addAll(viagens);
+        // }
+      },
+    );
   }
 
   @override
@@ -62,8 +68,8 @@ class _ListaViagemPageState extends State<ListaViagemPage> {
       body: _criarBody(),
       floatingActionButton: FloatingActionButton(
         onPressed: _abrirForm,
-        child: Icon(Icons.add),
         tooltip: 'Nova Viagem',
+        child: const Icon(Icons.add),
       ),
     );
   }
@@ -71,7 +77,7 @@ class _ListaViagemPageState extends State<ListaViagemPage> {
   AppBar _criarAppBar(BuildContext context) {
     return AppBar(
       backgroundColor: Theme.of(context).colorScheme.primaryContainer,
-      title: Text('Viagens'),
+      title: const Text('Viagens'),
       centerTitle: true,
       actions: [
         IconButton(
@@ -128,15 +134,15 @@ class _ListaViagemPageState extends State<ListaViagemPage> {
         final viagem = _viagens[index];
         return Container(
           decoration: BoxDecoration(
-            color:
-                Color.fromARGB(255, 162, 240, 168), // Cor de fundo do container
+            color: const Color.fromARGB(
+                255, 162, 240, 168), // Cor de fundo do container
             borderRadius: BorderRadius.circular(20), // Bordas arredondadas
           ),
           child: PopupMenuButton<String>(
             child: ListTile(
               title: Text(
-                  '${viagem.id}     ${viagem.localiza == '' ? 'Sem local definido' : viagem.localiza}     ${viagem.dataFormatada}'),
-              subtitle: Text('${viagem.comentario}'),
+                  '${viagem.id}     ${viagem.dataFormatada}     ${viagem.localiza == '' ? 'Sem local definido' : viagem.localiza}'),
+              subtitle: Text(viagem.comentario),
             ),
             itemBuilder: (BuildContext context) => criarItensMenuPopUp(),
             onSelected: (String valorSelecionado) {
@@ -173,16 +179,17 @@ class _ListaViagemPageState extends State<ListaViagemPage> {
   List<PopupMenuEntry<String>> criarItensMenuPopUp() {
     return [
       const PopupMenuItem(
-          value: ACAO_VISUALIZAR,
-          child: Row(
-            children: [
-              Icon(Icons.info, color: Colors.blue),
-              Padding(
-                padding: EdgeInsets.only(left: 10),
-                child: Text('Visualizar'),
-              )
-            ],
-          )),
+        value: ACAO_VISUALIZAR,
+        child: Row(
+          children: [
+            Icon(Icons.info, color: Colors.blue),
+            Padding(
+              padding: EdgeInsets.only(left: 10),
+              child: Text('Visualizar'),
+            )
+          ],
+        ),
+      ),
       const PopupMenuItem(
         value: ACAO_EDITAR,
         child: Row(
@@ -236,18 +243,21 @@ class _ListaViagemPageState extends State<ListaViagemPage> {
                 onPressed: () => Navigator.of(context).pop(),
                 child: const Text('Cancelar')),
             TextButton(
-                onPressed: () {
-                  Navigator.of(context).pop();
-                  if (viagem.id == null) {
-                    return;
-                  }
-                  _dao.remover(viagem.id!).then((success) {
+              onPressed: () {
+                Navigator.of(context).pop();
+                if (viagem.id == null) {
+                  return;
+                }
+                _dao.remover(viagem.id!).then(
+                  (success) {
                     if (success) {
                       _atualizarLista();
                     }
-                  });
-                },
-                child: Text('Ok')),
+                  },
+                );
+              },
+              child: const Text('Ok'),
+            ),
           ],
         );
       },
@@ -267,7 +277,7 @@ class _ListaViagemPageState extends State<ListaViagemPage> {
           actions: [
             TextButton(
               onPressed: () => Navigator.of(context).pop(),
-              child: Text('Cancelar'),
+              child: const Text('Cancelar'),
             ),
             TextButton(
               onPressed: () {
@@ -276,17 +286,19 @@ class _ListaViagemPageState extends State<ListaViagemPage> {
                   setState(
                     () {
                       final novaViagem = key.currentState!.novaViagem;
-                      _dao.salvar(novaViagem).then((success) {
-                        if (success) {
-                          _atualizarLista();
-                        }
-                      });
+                      _dao.salvar(novaViagem).then(
+                        (success) {
+                          if (success) {
+                            _atualizarLista();
+                          }
+                        },
+                      );
                     },
                   );
                   Navigator.of(context).pop();
                 }
               },
-              child: Text('Salvar'),
+              child: const Text('Salvar'),
             )
           ],
         );
