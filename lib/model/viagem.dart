@@ -18,7 +18,6 @@ class Viagem {
       required this.data,
       required this.localiza});
 
-  // utilizado para formatar a data
   String get dataFormatada {
     if (data == null) {
       return 'Sem data definida';

@@ -134,15 +134,14 @@ class _ListaViagemPageState extends State<ListaViagemPage> {
         final viagem = _viagens[index];
         return Container(
           decoration: BoxDecoration(
-            color: const Color.fromARGB(
-                255, 162, 240, 168), // Cor de fundo do container
-            borderRadius: BorderRadius.circular(20), // Bordas arredondadas
+            color: const Color.fromARGB(255, 162, 240, 168),
+            borderRadius: BorderRadius.circular(20),
           ),
           child: PopupMenuButton<String>(
             child: ListTile(
               title: Text(
-                  '${viagem.id}     ${viagem.dataFormatada}     ${viagem.localiza == '' ? 'Sem local definido' : viagem.localiza}'),
-              subtitle: Text(viagem.comentario),
+                  '${viagem.id}   Data: ${viagem.dataFormatada}\nLocal: ${viagem.localiza == '' ? 'Sem local definido' : viagem.localiza}'),
+              subtitle: Text('Descrição: ${viagem.comentario}'),
             ),
             itemBuilder: (BuildContext context) => criarItensMenuPopUp(),
             onSelected: (String valorSelecionado) {
@@ -151,8 +150,11 @@ class _ListaViagemPageState extends State<ListaViagemPage> {
               } else if (valorSelecionado == ACAO_EXCLUIR) {
                 _excluir(viagem);
               } else {
-                Navigator.of(context).push(MaterialPageRoute(
-                    builder: (_) => DetalheViagemPage(viagem: viagem)));
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (_) => DetalheViagemPage(viagem: viagem),
+                  ),
+                );
               }
             },
           ),

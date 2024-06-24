@@ -42,16 +42,16 @@ class DetalheViagemPageState extends State<DetalheViagemPage> {
           ),
           Row(
             children: [
-              const Campo(descricao: 'Localização:'),
+              const Campo(descricao: 'Local:'),
               Valor(valor: widget.viagem.localiza),
             ],
           ),
-          Row(
-            children: [
-              const Campo(descricao: 'Cometário:'),
+          // Column(
+          //   children: [
+              const Campo(descricao: 'Descrição:'),
               Valor(valor: widget.viagem.comentario),
-            ],
-          ),
+          //   ],
+          // ),
         ],
       ),
     );

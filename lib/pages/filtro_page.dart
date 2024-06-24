@@ -16,9 +16,9 @@ class FiltroPage extends StatefulWidget {
 class _FiltroPageState extends State<FiltroPage> {
   final camposParaOrdenacao = {
     Viagem.campo_id: 'Código',
-    Viagem.campo_comentario: 'Comentario',
+    Viagem.campo_comentario: 'Descrição',
     Viagem.campo_data: 'Data',
-    Viagem.campo_localiza: "Localização"
+    Viagem.campo_localiza: "Local"
   };
 
   late final SharedPreferences prefs;
@@ -94,7 +94,7 @@ class _FiltroPageState extends State<FiltroPage> {
           padding: const EdgeInsets.symmetric(horizontal: 10),
           child: TextField(
             decoration:
-                const InputDecoration(labelText: 'O comentário começa com:'),
+                const InputDecoration(labelText: 'A descrição começa com:'),
             controller: _comentarioController,
             onChanged: _onFiltroDComentarioChange,
           ),
